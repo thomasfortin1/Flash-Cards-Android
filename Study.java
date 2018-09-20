@@ -39,6 +39,7 @@ public class Study extends AppCompatActivity {
         cardView.setText(currentCard.getFront());
         sideView.setText(front);
         ratingBar.setRating(currentCard.getSaturation() / 2);
+        ratingBar.setIsIndicator(true);
     }
 
     public void flip(View v) {
@@ -133,7 +134,7 @@ public class Study extends AppCompatActivity {
         }
 
         public Card next(){
-            if (empty()) return new Card("There currently are no active decks", "There currently are no active decks");
+            if (empty()) return new Card("There currently are no active decks\nGo to Edit Decks to make a new one or go to Settings to activate one.", "There currently are no active decks\nGo to Edit Decks to make a new one or go to Settings to activate one.");
 
             Random random = new Random();
 
@@ -162,5 +163,11 @@ public class Study extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        MainActivity.saveDecks(this);
+        super.onPause();
     }
 }

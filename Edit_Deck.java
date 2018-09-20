@@ -18,6 +18,7 @@ public class Edit_Deck extends AppCompatActivity {
     EditText editText;
     EditText editTextTitle;
     TextView sideView;
+    TextView numberView;
 
 
     @Override
@@ -31,10 +32,15 @@ public class Edit_Deck extends AppCompatActivity {
         editText = findViewById(R.id.Edit_Text);
         editTextTitle = findViewById(R.id.Edit_Text_Title);
         sideView = findViewById(R.id.Edit_Deck_Side_View);
+        numberView = findViewById(R.id.Edit_Deck_Card_Number);
         cardNum = 0;
         editTextTitle.setText(MainActivity.Decks.get(position).getName());
-        editText.setText(MainActivity.Decks.get(position).getCard(cardNum).getFront());
-        sideView.setText("Front");
+        if(MainActivity.Decks.get(position).getSize() == 0) NoCards();
+        else {
+            editText.setText(MainActivity.Decks.get(position).getCard(cardNum).getFront());
+            sideView.setText("Front");
+            numberView.setText((cardNum + 1) + "/" + MainActivity.Decks.get(position).getSize());
+        }
     }
 
     @Override
@@ -51,6 +57,7 @@ public class Edit_Deck extends AppCompatActivity {
             cardNum = Mod((cardNum + 1), MainActivity.Decks.get(position).getSize());
             editText.setText(MainActivity.Decks.get(position).getCard(cardNum).getFront());
             sideView.setText("Front");
+            numberView.setText((cardNum + 1) + "/" + MainActivity.Decks.get(position).getSize());
             side = 0;
         }
     }
@@ -62,6 +69,7 @@ public class Edit_Deck extends AppCompatActivity {
             cardNum = Mod((cardNum - 1), MainActivity.Decks.get(position).getSize());
             editText.setText(MainActivity.Decks.get(position).getCard(cardNum).getFront());
             sideView.setText("Front");
+            numberView.setText((cardNum + 1) + "/" + MainActivity.Decks.get(position).getSize());
             side = 0;
         }
     }
@@ -90,6 +98,7 @@ public class Edit_Deck extends AppCompatActivity {
         cardNum = MainActivity.Decks.get(position).getSize() - 1;
         editText.setText(MainActivity.Decks.get(position).getCard(cardNum).getFront());
         sideView.setText("Front");
+        numberView.setText((cardNum + 1) + "/" + MainActivity.Decks.get(position).getSize());
         update = true;
     }
 
@@ -100,6 +109,7 @@ public class Edit_Deck extends AppCompatActivity {
             if (MainActivity.Decks.get(position).getSize() != 0){
                 cardNum = Mod((cardNum - 1), MainActivity.Decks.get(position).getSize());
                 editText.setText(MainActivity.Decks.get(position).getCard(cardNum).getFront());
+                numberView.setText((cardNum + 1) + "/" + MainActivity.Decks.get(position).getSize());
                 sideView.setText("Front");
             }
             else{
@@ -130,5 +140,6 @@ public class Edit_Deck extends AppCompatActivity {
     public void NoCards(){
         editText.setText("There are no cards in this deck yet");
         sideView.setText("ERROR");
+        numberView.setText("ERROR");
     }
 }

@@ -51,21 +51,21 @@ public class MainActivity extends AppCompatActivity {
         SQLiteOpenHelper helper = new SQLiteOpenHelper(context, "MyDatabase", null, 1) {
             @Override
             public void onCreate(SQLiteDatabase db){
-
             }
-
             @Override
             public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
             }
         };
+
         boolean foundDecks = true;
         SQLiteDatabase database = helper.getWritableDatabase();
         Cursor cursor;
+
         try{database.query("Decks", null, null, null, null, null, null);}
         catch(SQLException e){
             foundDecks = false;
         }
+
         if(foundDecks) {
             cursor = database.query("Decks", null, null, null, null, null, null);
             while (cursor.moveToNext()) {
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         int active;
         ContentValues values  = new ContentValues();
         database.execSQL("CREATE TABLE Decks(id int primary key, name text, active int)");
+
         for(int x = 0; x < Decks.size(); x++){
             if(Decks.get(x).getActive()) active = 1;
             else active = 0;
@@ -117,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void loadDecks() {
         SQLiteDatabase database = helper.getReadableDatabase();

@@ -11,7 +11,7 @@ public class Deck {
 
     public Deck(String name){
         this.name = name;
-        active = false;
+        active = true;
     }
 
     public Deck(String name, boolean active){

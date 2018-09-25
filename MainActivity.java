@@ -1,4 +1,4 @@
-package com.example.thoma.flashcards2;
+package com.example.thoma.SmartStudy;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -25,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //if(MainActivity.Decks.size() == 0) testRecyclerView();
+
+        //Set up database to save Decks
         helper = new SQLiteOpenHelper(this, "MyDatabase", null, 1) {
             @Override
             public void onCreate(SQLiteDatabase db){
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+        //We only want to load the Decks if we just restarted the app
         if (activate) loadDecks();
         activate = false;
     }
@@ -48,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void saveDecks(Context context){
+
+        //Set up database
+        //This function has to be static so it can be called by other activities.
+        //So we need to make a new SQLiteOpenHelper because static methods can't use anything outside
+        //of the function itself
         SQLiteOpenHelper helper = new SQLiteOpenHelper(context, "MyDatabase", null, 1) {
             @Override
             public void onCreate(SQLiteDatabase db){
@@ -61,11 +68,15 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase database = helper.getWritableDatabase();
         Cursor cursor;
 
+        //Check to see if we've made a table for Decks yet
         try{database.query("Decks", null, null, null, null, null, null);}
         catch(SQLException e){
             foundDecks = false;
         }
 
+        //If we have then get rid of it and all tables for all other decks
+        //The database has one table for all the Decks
+        //And a table for each deck with all their cards
         if(foundDecks) {
             cursor = database.query("Decks", null, null, null, null, null, null);
             while (cursor.moveToNext()) {
@@ -80,10 +91,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d("save", "deleted Decks");
         }
 
+        //Then make them all again with the new data
         int active;
         ContentValues values  = new ContentValues();
         database.execSQL("CREATE TABLE Decks(id int primary key, name text, active int)");
 
+        //Table with deck names
         for(int x = 0; x < Decks.size(); x++){
             if(Decks.get(x).getActive()) active = 1;
             else active = 0;
@@ -97,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
             values.clear();
         }
 
+        //Tables with cards for each deck
         for(int x = 0; x < Decks.size(); x++){
             boolean foundTable = true;
             try{database.execSQL("CREATE TABLE a" + String.valueOf(x) + "(id int primary key, front text, back text, saturation int)");}
@@ -122,13 +136,16 @@ public class MainActivity extends AppCompatActivity {
     private void loadDecks() {
         SQLiteDatabase database = helper.getReadableDatabase();
 
+        //Make sure there is a table for the decks
+        //If there isn't then just return
         try{database.query("Decks", null, null, null, null, null, null);}
         catch(SQLException e){
             Log.d("database query", "Didn't find deck");
             return;
         }
-        Log.d("database query", "Did find deck");
 
+        //Go through deck table and create a Deck object for each row
+        Log.d("database query", "Did find deck");
         Cursor cursor = database.query("Decks", null, null, null, null, null, null);
         String name;
         boolean active;
@@ -145,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d("after while loop", "got this far");
 
+
+        //Go through the table for each deck and populate the decks with the appropriate cards
         String front;
         String back;
         int saturation;
@@ -161,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("end of function", "got this far");
     }
 
+    //For testing purposes
     public void testRecyclerView(){
         for(int x = 0; x < 100; x++){
             MainActivity.Decks.add(new Deck(String.valueOf(x)));

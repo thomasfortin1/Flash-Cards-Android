@@ -1,4 +1,4 @@
-package com.example.thoma.flashcards2;
+package com.example.thoma.SmartStudy;
 
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -58,6 +58,7 @@ public class Study extends AppCompatActivity {
 
     public void gotIt(View v){
         currentCard.gotIt();
+        //Tell Dealer to put card into right bucket
         if(currentCard.getSaturation() == 2) dealer.makeFocused(currentCard);
         if(currentCard.getSaturation() == 8) dealer.makeUnfocused(currentCard);
         currentCard = dealer.next();
@@ -67,6 +68,7 @@ public class Study extends AppCompatActivity {
 
     public void didNotGetIt(View v){
         currentCard.didnotgetIT();
+        //Tell Dealer to put card into right bucket
         if(currentCard.getSaturation() == 1) dealer.makeUnfocused(currentCard);
         if(currentCard.getSaturation() == 7) dealer.makeFocused(currentCard);
         currentCard = dealer.next();
@@ -76,6 +78,7 @@ public class Study extends AppCompatActivity {
 
     public void knowIt(View v){
         currentCard.knowIt();
+        //Make sure this card goes into the unfocused bucket
         dealer.makeUnfocused(currentCard);
         currentCard = dealer.next();
         side = 0;
@@ -83,6 +86,7 @@ public class Study extends AppCompatActivity {
     }
 
     public void next(){
+        //update Views
         if(side == 0){
             cardView.setText(currentCard.getFront());
             sideView.setText(front);
@@ -101,6 +105,8 @@ public class Study extends AppCompatActivity {
         ArrayList<Card> unfocusedCards = new ArrayList<Card>();
 
         public Dealer(){
+            //Sort all the cards into focused and unfocused buckets
+            //Focused cards have saturation between 2 & 7, inclusively
             for(int x = 0; x < MainActivity.Decks.size(); x++){
                 if(MainActivity.Decks.get(x).getActive()){
                     for(int y = 0; y < MainActivity.Decks.get(x).getSize(); y++){
@@ -138,26 +144,36 @@ public class Study extends AppCompatActivity {
 
             Random random = new Random();
 
+            //If either focused or unfocused card buckets are empty just return a random card from the other
             if(focusedCards.size() == 0) return unfocusedCards.get(random.nextInt(unfocusedCards.size()));
             if(unfocusedCards.size() == 0) return focusedCards.get(random.nextInt(focusedCards.size()));
 
+            //If we have 7 or more focused cards then we want to focus on those ones
             if(focusedCards.size() >= 7){
                 if(random.nextInt(100) + 1 > randomness){
                     return focusedCards.get(random.nextInt(focusedCards.size()));
                 }
+                //if randomness is high enough we may still just return a random card
                 else {
                     return cards.get(random.nextInt(cards.size()));
                 }
             }
+            //If we have less than 7 focused cards then we want to get more
             else{
                 if(random.nextInt(100) + 1 > randomness){
+                    //We would prefer to show a card that has a saturation less
+                    //than 2, so we make a new bucket just for this case
+                    //called unknown cards
                     ArrayList<Card> unknownCards = new ArrayList<Card>();
                     for(int x = 0; x < unfocusedCards.size(); x++){
                         if(unfocusedCards.get(x).getSaturation() < 2) unknownCards.add(unfocusedCards.get(x));
                     }
+                    //If there are any unknown cards then return one of those
+                    //Otherwise just return a random card
                     if(unknownCards.size() > 0) return unknownCards.get(random.nextInt(unknownCards.size()));
                     else return cards.get(random.nextInt(cards.size()));
                 }
+                // If randomness is high enough we may just return a random card anyways
                 else{
                     return cards.get(random.nextInt(cards.size()));
                 }
